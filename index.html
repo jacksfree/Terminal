@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Goals Command Center</title>
+    <meta
+      name="description"
+      content="A command-center style goals tracker for daily habits, history, calendar visibility, and lightweight planning."
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="ambient-layer" aria-hidden="true"></div>
+    <div class="grid-layer" aria-hidden="true"></div>
+
+    <div class="app-shell">
+      <header class="masthead panel">
+        <div class="masthead-copy">
+          <p class="eyebrow">Personal Ops Dashboard</p>
+          <h1>Goals Command Center</h1>
+          <p class="masthead-text">
+            Keep habits, history, and calendar pressure in one operating view,
+            with a simple assistant ready for quick questions.
+          </p>
+        </div>
+
+        <div class="masthead-actions">
+          <div class="date-lockup">
+            <span class="eyebrow">Live Date</span>
+            <strong id="todayLabel">Loading…</strong>
+          </div>
+
+          <div class="button-row">
+            <button id="loadDemoButton" class="button ghost" type="button">
+              Load Demo Data
+            </button>
+            <button id="resetButton" class="button danger" type="button">
+              Reset Local Data
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main class="command-grid">
+        <section class="panel overview-panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">System Snapshot</p>
+              <h2>Daily Operating Picture</h2>
+            </div>
+            <div class="badge" id="focusBadge">Stand by</div>
+          </div>
+
+          <div class="overview-grid">
+            <article class="hero-card">
+              <div class="hero-meter">
+                <svg viewBox="0 0 120 120" class="score-ring" aria-hidden="true">
+                  <circle class="score-track" cx="60" cy="60" r="46"></circle>
+                  <circle
+                    class="score-progress"
+                    cx="60"
+                    cy="60"
+                    r="46"
+                    id="scoreProgress"
+                  ></circle>
+                </svg>
+                <div class="score-copy">
+                  <span class="eyebrow">Day Coverage</span>
+                  <strong id="dayScore">0%</strong>
+                  <span id="dayScoreMeta">0 of 0 habits closed</span>
+                </div>
+              </div>
+
+              <div class="focus-block">
+                <span class="eyebrow">Mission Prompt</span>
+                <p id="missionPrompt">
+                  Add habits or load the demo to see your command center come to
+                  life.
+                </p>
+              </div>
+            </article>
+
+            <article class="metric-rack" id="metricRack" aria-live="polite"></article>
+
+            <article class="trend-card">
+              <div class="panel-header compact">
+                <div>
+                  <p class="eyebrow">Momentum Trace</p>
+                  <h3>Last 7 Days</h3>
+                </div>
+                <span class="subtle" id="trendLabel">No activity yet</span>
+              </div>
+
+              <svg id="trendSparkline" viewBox="0 0 320 110" class="sparkline" aria-hidden="true"></svg>
+              <div class="sparkline-labels" id="sparklineLabels"></div>
+            </article>
+
+            <article class="briefing-card">
+              <div class="panel-header compact">
+                <div>
+                  <p class="eyebrow">Command Briefing</p>
+                  <h3>What Needs Attention</h3>
+                </div>
+              </div>
+
+              <ul class="briefing-list" id="briefingList"></ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel habits-panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Daily Habits</p>
+              <h2>Track Today’s Reps</h2>
+            </div>
+            <div class="badge" id="habitSummaryBadge">0 active</div>
+          </div>
+
+          <div class="habit-list" id="habitList"></div>
+        </section>
+
+        <section class="panel builder-panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Habit Builder</p>
+              <h2 id="formHeading">Add New Habit</h2>
+            </div>
+            <button id="cancelEditButton" class="button ghost hidden" type="button">
+              Cancel Edit
+            </button>
+          </div>
+
+          <form id="habitForm" class="habit-form">
+            <input type="hidden" id="habitId" />
+
+            <label>
+              Habit Name
+              <input
+                id="habitName"
+                name="habitName"
+                type="text"
+                maxlength="40"
+                placeholder="Deep work block"
+                required
+              />
+            </label>
+
+            <label>
+              Category
+              <input
+                id="habitCategory"
+                name="habitCategory"
+                type="text"
+                maxlength="30"
+                placeholder="Work, Health, Home"
+              />
+            </label>
+
+            <label>
+              Cadence
+              <select id="habitSchedule" name="habitSchedule">
+                <option value="daily">Every day</option>
+                <option value="weekdays">Weekdays</option>
+                <option value="custom">Custom days</option>
+                <option value="times-per-week">Times per week</option>
+              </select>
+            </label>
+
+            <div id="customDaysField" class="custom-days hidden">
+              <span>Choose days</span>
+              <div class="day-picker">
+                <label><input type="checkbox" value="1" /> Mon</label>
+                <label><input type="checkbox" value="2" /> Tue</label>
+                <label><input type="checkbox" value="3" /> Wed</label>
+                <label><input type="checkbox" value="4" /> Thu</label>
+                <label><input type="checkbox" value="5" /> Fri</label>
+                <label><input type="checkbox" value="6" /> Sat</label>
+                <label><input type="checkbox" value="0" /> Sun</label>
+              </div>
+            </div>
+
+            <label>
+              <span id="targetLabel">Target per day</span>
+              <input
+                id="habitTarget"
+                name="habitTarget"
+                type="number"
+                min="1"
+                max="12"
+                value="1"
+                required
+              />
+            </label>
+
+            <label>
+              Signal Color
+              <select id="habitColor" name="habitColor">
+                <option value="cyan">Cyan</option>
+                <option value="amber">Amber</option>
+                <option value="mint">Mint</option>
+                <option value="coral">Coral</option>
+                <option value="indigo">Indigo</option>
+              </select>
+            </label>
+
+            <button class="button primary wide" type="submit" id="saveHabitButton">
+              Save Habit
+            </button>
+          </form>
+        </section>
+
+        <section class="panel calendar-panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Calendar Feed</p>
+              <h2>Import Upcoming Events</h2>
+            </div>
+            <button id="clearCalendarButton" class="button ghost" type="button">
+              Clear Feed
+            </button>
+          </div>
+
+          <div id="calendarDropzone" class="dropzone" tabindex="0">
+            <p>Drag an <code>.ics</code> file here or choose one from your device.</p>
+            <button id="calendarBrowseButton" class="button ghost" type="button">
+              Choose Calendar File
+            </button>
+            <input
+              id="calendarFileInput"
+              type="file"
+              accept=".ics,text/calendar"
+              class="hidden"
+            />
+          </div>
+
+          <div class="calendar-meta" id="calendarMeta">
+            No imported events yet.
+          </div>
+          <div class="calendar-list" id="calendarList"></div>
+        </section>
+
+        <section class="panel history-panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">History Grid</p>
+              <h2>Review the Last 14 Days</h2>
+            </div>
+            <div class="badge" id="historyBadge">No history</div>
+          </div>
+
+          <div class="history-grid" id="historyGrid"></div>
+          <div class="activity-feed" id="activityFeed"></div>
+        </section>
+
+        <section class="panel assistant-panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Ops Analyst</p>
+              <h2>Ask the In-App Assistant</h2>
+            </div>
+            <div class="badge">Prototype Mode</div>
+          </div>
+
+          <div class="suggestion-row" id="assistantSuggestions"></div>
+          <div class="assistant-log" id="assistantLog" aria-live="polite"></div>
+
+          <form id="assistantForm" class="assistant-form">
+            <input
+              id="assistantInput"
+              type="text"
+              maxlength="140"
+              placeholder="What should I focus on today?"
+              required
+            />
+            <button class="button primary" type="submit">Ask</button>
+          </form>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
